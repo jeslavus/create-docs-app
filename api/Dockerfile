@@ -1,8 +1,8 @@
-# Указываем базовый образ
 FROM php:8.1-fpm
 
-# Устанавливаем системные зависимости
+# Install dependencies
 RUN apt-get update && apt-get install -y \
+    build-essential \
     libpng-dev \
     libjpeg62-turbo-dev \
     libfreetype6-dev \
@@ -12,29 +12,26 @@ RUN apt-get update && apt-get install -y \
     vim \
     unzip \
     git \
-    curl
+    curl \
+    libzip-dev
 
-# Устанавливаем PHP-расширения
-RUN docker-php-ext-install pdo pdo_mysql gd
+# Install PHP extensions
+RUN docker-php-ext-install pdo pdo_mysql zip exif pcntl
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg
+RUN docker-php-ext-install gd
 
-# Устанавливаем Composer
+# Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Копируем приложение в контейнер
-COPY . /var/www
-
-# Устанавливаем права
-RUN chown -R www-data:www-data /var/www \
-    && chmod -R 755 /var/www/storage
-
-# Устанавливаем рабочую директорию
+# Set working directory
 WORKDIR /var/www
 
-# Устанавливаем зависимости Laravel
-RUN composer install --no-interaction --prefer-dist --optimize-autoloader
+# Copy existing application directory contents
+COPY . /var/www
 
-# Устанавливаем права для хранения файлов и кеширования
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+# Install Laravel dependencies
+RUN composer install
 
-# Указываем, что контейнер должен выполнять команду php-fpm
+# Expose port 9000 and start php-fpm server
+EXPOSE 9000
 CMD ["php-fpm"]

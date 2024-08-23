@@ -1,21 +1,19 @@
-# Указываем базовый образ
-FROM node:18
+# Use an official node image as a parent image
+FROM node:16-alpine
 
-# Устанавливаем рабочую директорию
+# Set working directory
 WORKDIR /app
 
-# Копируем package.json и устанавливаем зависимости
+# Install dependencies
 COPY package*.json ./
 RUN npm install
 
-# Копируем остальные файлы
+# Copy the current directory contents into the container at /app
 COPY . .
 
-# Собираем приложение для продакшена
+# Build the Vue.js application
 RUN npm run build
 
-# Экспонируем порт
+# Serve the application
 EXPOSE 8080
-
-# Команда по умолчанию для запуска контейнера
 CMD ["npm", "run", "serve"]
