@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import TheWelcome from '../components/TheWelcome.vue'
+import DocumentForm from '../components/DocumentForm.vue'
 </script>
 
 <template>
   <main>
-    <TheWelcome />
+    <DocumentForm />
   </main>
 </template>
